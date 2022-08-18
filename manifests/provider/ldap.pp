@@ -339,7 +339,8 @@ define sssd::provider::ldap (
   Optional[Integer[0]]                  $ldap_idmap_range_size             = undef,
   Optional[String[1]]                   $ldap_idmap_default_domain_sid     = undef,
   Optional[String[1]]                   $ldap_idmap_default_domain         = undef,
-  Boolean                               $ldap_idmap_autorid_compat         = false
+  Boolean                               $ldap_idmap_autorid_compat         = false,
+  Boolean                               $use_app_pki                       = true,
 ) {
   include $module_name
 
@@ -352,19 +353,19 @@ define sssd::provider::ldap (
 
   if $app_pki_ca_dir {
     $ldap_tls_cacertdir = $app_pki_ca_dir
-  } else {
+  } elsif $use_app_pki {
     $ldap_tls_cacertdir = "${sssd::app_pki_dir}/cacerts"
   }
 
   if $app_pki_key {
     $ldap_tls_key = $app_pki_key
-  } else {
+  } elsif $use_app_pki {
     $ldap_tls_key = "${sssd::app_pki_dir}/private/${$facts['fqdn']}.pem"
   }
 
   if $app_pki_cert {
     $ldap_tls_cert = $app_pki_cert
-  } else {
+  } elsif $use_app_pki {
     $ldap_tls_cert = "${sssd::app_pki_dir}/public/${$facts['fqdn']}.pub"
   }
 
